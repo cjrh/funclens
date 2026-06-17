@@ -2,34 +2,56 @@
 
 List longest N functions in a codebase.
 
+## Why?
+
+It turns out that simply using LOC as a measure of "code complexity"
+is sufficient. More complex metrics like cyclomatic complexity are often
+not worth the effort, see JAY et al. (2009) for an empirical study of 
+the relationship between cyclomatic complexity and lines of code. In practice,
+long functions are often the most complex and hardest to maintain, so finding
+them is a good starting point for refactoring efforts.
+
+Many codebases use multiple languages. I wanted a tool that could find long
+functions across all languages in a project.
+
+Reference:
+
+JAY, G. , HALE, J. , SMITH, R. , HALE, D. , KRAFT, N. and WARD, C. (2009) Cyclomatic Complexity and Lines of Code: Empirical Evidence of a Stable Linear Relationship. Journal of Software Engineering and Applications, 2, 137-143. doi: [10.4236/jsea.2009.23020](https://www.scirp.org/journal/paperinformation?paperid=779].
+
 ## Install
 
 TODO
 
 ## Usage
 
+Pay attention: it automatically finds long functions across different languages.
+
 ```
-$ funclens src
-185 build_registry src/language.rs
- 32 extract src/scan.rs
- 21 functions_in_file src/scan.rs
- 17 collect_code_rows src/scan.rs
- 17 main src/main.rs
+$ funclens .
+21 process_order ./api/handlers.py
+17 renderCart ./web/cart.ts
+10 drain ./worker/queue.go
+ 8 schedule ./worker/scheduler.rs
+ 5 deploy ./scripts/deploy.sh
+ 3 handle ./worker/queue.go
 ```
 
-Each row is the line count, the function name, and the file it lives in. By
-default the 20 longest functions are shown.
+Each row is the line count, the function name, and the file it lives in. One
+ranking spans every language in the tree, so a Python handler and a TypeScript
+component sit in the same list. By default the 20 longest functions are shown.
 
 Pass `--logical` to count only lines that carry code, skipping blank and
-comment-only lines (the same idea as `cloc`):
+comment-only lines (the same idea as `cloc`). Here it drops `process_order`
+below the comment-free `renderCart`:
 
 ```
-$ funclens --logical src
-163 build_registry src/language.rs
- 29 extract src/scan.rs
- 19 functions_in_file src/scan.rs
- 16 collect_code_rows src/scan.rs
- 14 main src/main.rs
+$ funclens --logical .
+17 renderCart ./web/cart.ts
+15 process_order ./api/handlers.py
+10 drain ./worker/queue.go
+ 8 schedule ./worker/scheduler.rs
+ 5 deploy ./scripts/deploy.sh
+ 3 handle ./worker/queue.go
 ```
 
 `.gitignore` is respected, so build artifacts and vendored code stay out of the
