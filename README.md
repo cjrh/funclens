@@ -1,18 +1,10 @@
 # funclens
 
-Rank the functions in a project by how many lines they span. Point it at a
-directory and it walks the tree, finds every function across 25 languages using
-tree-sitter, and prints the longest ones first. Long functions are often where
-complexity hides, so this is a quick way to find the parts of a codebase worth a
-closer look.
+List longest N functions in a codebase.
 
 ## Install
 
-```
-cargo build --release
-```
-
-The binary lands at `target/release/funclens`.
+TODO
 
 ## Usage
 
@@ -61,13 +53,10 @@ Bash, C, C#, C++, Dart, Elixir, Go, Haskell, Java, JavaScript, Julia, Kotlin,
 Lua, OCaml, Perl, PHP, Python, R, Ruby, Rust, Scala, Swift, TypeScript (and
 TSX), Zig.
 
-Adding one means a single entry in `src/language.rs`: a grammar plus a
-tree-sitter query that captures function definitions. Nothing else changes.
-
 ## Known limits
 
 A few languages do not map a function to a single named node, so their handling
-makes a deliberate trade-off:
+is tricky:
 
 - Haskell reports each equation of a multi-clause function separately.
 - OCaml counts a `let` only when it takes a parameter, so plain value bindings
