@@ -20,7 +20,18 @@ JAY, G. , HALE, J. , SMITH, R. , HALE, D. , KRAFT, N. and WARD, C. (2009) Cyclom
 
 ## Install
 
-TODO
+The easiest install is with
+[`cargo binstall`](https://github.com/cargo-bins/cargo-binstall): it
+downloads a precompiled binary from the GitHub releases, so there is no
+Rust toolchain or compile step. This crate is not published to crates.io,
+so point `binstall` at the repository instead of a crate name:
+
+```sh
+cargo binstall --git https://github.com/cjrh/funclens funclens
+```
+
+`binstall` reads the version from the repo, finds the matching release,
+and drops the `funclens` binary on your `PATH`.
 
 ## Usage
 

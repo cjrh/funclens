@@ -36,3 +36,6 @@ tree-sitter-zig = "1.1"
 
 [profile.release]
 opt-level = 3
+
+[package.metadata.release]
+publish = false
