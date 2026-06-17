@@ -121,11 +121,18 @@ fn extract(
     path: &Path,
     mode: CountMode,
 ) -> Vec<Function> {
+    let src = source.as_bytes();
     let mut cursor = QueryCursor::new();
-    let mut matches = cursor.matches(&lang.query, tree.root_node(), source.as_bytes());
+    let mut matches = cursor.matches(&lang.query, tree.root_node(), src);
     let mut found = Vec::new();
+    // Reused across matches to evaluate any `#eq?`/`#any-of?`/... predicates
+    // the query carries (e.g. Elixir filtering `def`/`defp` calls by name).
+    let (mut buf1, mut buf2) = (Vec::new(), Vec::new());
 
     while let Some(m) = matches.next() {
+        if !m.satisfies_text_predicates(&lang.query, &mut buf1, &mut buf2, &mut { src }) {
+            continue;
+        }
         let func = m.nodes_for_capture_index(lang.func_capture).next();
         let name = m.nodes_for_capture_index(lang.name_capture).next();
         let (Some(func), Some(name)) = (func, name) else {

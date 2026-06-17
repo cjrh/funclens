@@ -160,8 +160,112 @@ fn build_registry() -> Vec<Lang> {
             "(function_definition name: (name) @name) @func
              (method_declaration name: (name) @name) @func",
         ),
+        Lang::new(
+            "zig",
+            &["zig"],
+            tree_sitter_zig::LANGUAGE.into(),
+            // One node covers free functions, `pub fn`, and struct methods.
+            "(function_declaration name: (identifier) @name) @func",
+        ),
+        Lang::new(
+            "lua",
+            &["lua"],
+            tree_sitter_lua::LANGUAGE.into(),
+            // The wildcard name accepts plain, `tbl.method`, and `tbl:method`
+            // forms; the assigned-anonymous form (`x = function() end`) is left
+            // out, in keeping with the no-anonymous-functions policy.
+            "(function_declaration name: (_) @name) @func",
+        ),
+        Lang::new(
+            "kotlin",
+            &["kt", "kts"],
+            tree_sitter_kotlin_ng::LANGUAGE.into(),
+            "(function_declaration name: (identifier) @name) @func",
+        ),
+        Lang::new(
+            "swift",
+            &["swift"],
+            tree_sitter_swift::LANGUAGE.into(),
+            // Initializers carry no name node and so are not reported.
+            "(function_declaration name: (simple_identifier) @name) @func",
+        ),
+        Lang::new(
+            "scala",
+            &["scala", "sc"],
+            tree_sitter_scala::LANGUAGE.into(),
+            "(function_definition name: (identifier) @name) @func",
+        ),
+        Lang::new(
+            "elixir",
+            &["ex", "exs"],
+            tree_sitter_elixir::LANGUAGE.into(),
+            ELIXIR_QUERY,
+        ),
+        Lang::new(
+            "ocaml",
+            &["ml"],
+            tree_sitter_ocaml::LANGUAGE_OCAML.into(),
+            // A let-binding is a function only if it takes a parameter, which
+            // distinguishes `let f x = ...` from a plain `let v = ...` value.
+            "(value_definition (let_binding pattern: (value_name) @name (parameter)) @func)",
+        ),
+        Lang::new(
+            "haskell",
+            &["hs"],
+            tree_sitter_haskell::LANGUAGE.into(),
+            // Each equation is its own node, so a multi-clause function is
+            // reported once per clause.
+            "(function name: (variable) @name) @func",
+        ),
+        Lang::new(
+            "dart",
+            &["dart"],
+            tree_sitter_dart::LANGUAGE.into(),
+            "(function_declaration (function_signature name: (identifier) @name)) @func
+             (method_declaration
+                (method_signature (function_signature name: (identifier) @name))) @func",
+        ),
+        Lang::new(
+            "julia",
+            &["jl"],
+            tree_sitter_julia::LANGUAGE.into(),
+            // Long form (`function f(...)`) and assignment form (`f(x) = ...`);
+            // the anchor keeps the assignment's left-hand call from matching a
+            // call on the right-hand side.
+            "(function_definition (signature (call_expression (identifier) @name))) @func
+             (assignment . (call_expression (identifier) @name)) @func",
+        ),
+        Lang::new(
+            "r",
+            &["r", "R"],
+            tree_sitter_r::LANGUAGE.into(),
+            // Functions are values bound with `<-` or `=`; the name is the
+            // left-hand identifier, the line span the function literal.
+            "(binary_operator lhs: (identifier) @name rhs: (function_definition) @func)",
+        ),
+        Lang::new(
+            "perl",
+            &["pl", "pm"],
+            tree_sitter_perl::LANGUAGE.into(),
+            "(function_definition name: (identifier) @name) @func",
+        ),
     ]
 }
+
+/// In Elixir a definition is a macro call whose target is `def`/`defp` (etc.),
+/// structurally identical to `if`/`for`/`with` blocks. The `#any-of?` predicate
+/// is what separates them; the head is either a call (`def f(a) do`) or a bare
+/// identifier (`def f do`).
+const ELIXIR_QUERY: &str = r#"
+    ((call
+        target: (identifier) @kw
+        (arguments [
+            (call target: (identifier) @name)
+            (identifier) @name
+        ])
+        (do_block)) @func
+     (#any-of? @kw "def" "defp" "defmacro" "defmacrop"))
+"#;
 
 /// JavaScript/TypeScript functions take several shapes. Named declarations and
 /// class methods carry their own name; arrow and anonymous function expressions
