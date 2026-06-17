@@ -142,7 +142,11 @@ fn extract(
             continue;
         };
         let lines = count_lines(func, mode);
-        found.push(Function { lines, name: name.to_owned(), path: path.to_owned() });
+        found.push(Function {
+            lines,
+            name: name.to_owned(),
+            path: path.to_owned(),
+        });
     }
     found
 }

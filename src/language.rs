@@ -40,7 +40,13 @@ impl Lang {
             .unwrap_or_else(|e| panic!("invalid {label} query: {e}"));
         let func_capture = capture_index(&query, "func", label);
         let name_capture = capture_index(&query, "name", label);
-        Lang { extensions, language, query, func_capture, name_capture }
+        Lang {
+            extensions,
+            language,
+            query,
+            func_capture,
+            name_capture,
+        }
     }
 }
 
@@ -112,12 +118,7 @@ fn build_registry() -> Vec<Lang> {
             "(function_declaration name: (identifier) @name) @func
              (method_declaration name: (field_identifier) @name) @func",
         ),
-        Lang::new(
-            "c",
-            &["c", "h"],
-            tree_sitter_c::LANGUAGE.into(),
-            C_QUERY,
-        ),
+        Lang::new("c", &["c", "h"], tree_sitter_c::LANGUAGE.into(), C_QUERY),
         Lang::new(
             "cpp",
             &["cc", "cpp", "cxx", "hpp", "hh", "hxx"],

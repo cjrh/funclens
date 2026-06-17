@@ -41,8 +41,15 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    let filter = ExtFilter { include: cli.include, exclude: cli.exclude };
-    let mode = if cli.logical { CountMode::Logical } else { CountMode::Physical };
+    let filter = ExtFilter {
+        include: cli.include,
+        exclude: cli.exclude,
+    };
+    let mode = if cli.logical {
+        CountMode::Logical
+    } else {
+        CountMode::Physical
+    };
 
     let mut functions = scan::scan(&cli.path, &filter, mode);
     // Longest first; ties broken by name then path for a stable, readable order.
