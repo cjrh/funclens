@@ -16,7 +16,7 @@ functions across all languages in a project.
 
 Reference:
 
-JAY, G. , HALE, J. , SMITH, R. , HALE, D. , KRAFT, N. and WARD, C. (2009) Cyclomatic Complexity and Lines of Code: Empirical Evidence of a Stable Linear Relationship. Journal of Software Engineering and Applications, 2, 137-143. doi: [10.4236/jsea.2009.23020](https://www.scirp.org/journal/paperinformation?paperid=779].
+JAY, G. , HALE, J. , SMITH, R. , HALE, D. , KRAFT, N. and WARD, C. (2009) Cyclomatic Complexity and Lines of Code: Empirical Evidence of a Stable Linear Relationship. Journal of Software Engineering and Applications, 2, 137-143. doi: [10.4236/jsea.2009.23020](https://www.scirp.org/journal/paperinformation?paperid=779).
 
 ## Install
 
