@@ -63,10 +63,21 @@ impl ExtFilter {
 /// for the rest of the tree. The returned order is unspecified; callers rank it.
 pub fn scan(root: &Path, filter: &ExtFilter, mode: CountMode) -> Vec<Function> {
     let files = collect_files(root, filter);
-    files
-        .par_iter()
-        .flat_map_iter(|path| functions_in_file(path, mode).into_iter())
-        .collect()
+
+    // Rayon pays a fixed thread-pool startup cost. Keep tiny scans on the
+    // current thread so `funclens path/to/file.rs` feels instant, while larger
+    // trees still benefit from parallel parsing.
+    if files.len() < 6 {
+        files
+            .iter()
+            .flat_map(|path| functions_in_file(path, mode))
+            .collect()
+    } else {
+        files
+            .par_iter()
+            .flat_map_iter(|path| functions_in_file(path, mode).into_iter())
+            .collect()
+    }
 }
 
 /// Gather the paths of all scan-eligible files. The walk itself is cheap and
@@ -84,7 +95,7 @@ fn collect_files(root: &Path, filter: &ExtFilter) -> Vec<PathBuf> {
 
 fn eligible(path: &Path, filter: &ExtFilter) -> bool {
     match path.extension().and_then(|e| e.to_str()) {
-        Some(ext) => filter.accepts(ext) && language::for_extension(ext).is_some(),
+        Some(ext) => filter.accepts(ext) && language::supports_extension(ext),
         None => false,
     }
 }
